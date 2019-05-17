@@ -87,9 +87,10 @@ func main() {
 	if *horizontal {
 		fmt.Println(`rankdir="LR"`)
 	}
-	fmt.Print(`splines=ortho
+	fmt.Print(`splines=polyline
 nodesep=0.4
 ranksep=0.8
+graph [concentrate=true]
 node [shape="box",style="rounded,filled"]
 edge [arrowsize="0.5"]
 `)
@@ -100,6 +101,8 @@ edge [arrowsize="0.5"]
 		pkgKeys = append(pkgKeys, k)
 	}
 	sort.Strings(pkgKeys)
+
+	fmt.Println("\n// Beginning of node listing\n")
 
 	for _, pkgName := range pkgKeys {
 		pkg := pkgs[pkgName]
@@ -122,6 +125,18 @@ edge [arrowsize="0.5"]
 		}
 
 		fmt.Printf("%s [label=\"%s\" color=\"%s\" URL=\"%s\" target=\"_blank\"];\n", pkgId, pkgName, color, pkgURL(pkgName))
+	}
+
+	fmt.Println("\n// End of node listing\n")
+
+	for _, pkgName := range pkgKeys {
+
+		pkg := pkgs[pkgName]
+		pkgId := getId(pkgName)
+
+		if isIgnored(pkg) {
+			continue
+		}
 
 		// Don't render imports from packages in Goroot
 		if pkg.Goroot && !*withGoroot {
